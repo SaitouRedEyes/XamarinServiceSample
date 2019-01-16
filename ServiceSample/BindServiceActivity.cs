@@ -1,36 +1,58 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 using Android.App;
 using Android.Content;
 using Android.OS;
-using Android.Runtime;
-using Android.Views;
+using Android.Support.V7.App;
 using Android.Widget;
 
 namespace ServiceSample
 {
     [Activity(Label = "BindServiceActivity")]
-    public class BindServiceActivity : Activity, IServiceConnection
+    public class BindServiceActivity : AppCompatActivity, IServiceConnection
     {
-        private Counter counter;
+        private Count counter;
         private CountBinder binder;
         private bool isConnected;
+
+        public void OnServiceConnected(ComponentName name, IBinder service)
+        {
+            binder = (CountBinder)service;
+
+            isConnected = binder != null;
+
+            if (isConnected)
+            {
+                counter = binder.Service;
+                Toast.MakeText(this, "Service Connected", ToastLength.Short).Show();
+            }
+            else
+            {
+                counter = null;
+                Toast.MakeText(this, "Service Not Connected", ToastLength.Short).Show();
+            }
+        }
+
+        public void OnServiceDisconnected(ComponentName name)
+        {
+            counter = null;
+            binder = null;
+            isConnected = false;
+
+            Toast.MakeText(this, "Service Disconnected", ToastLength.Short).Show();
+        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
 
-            SetContentView(Resource.Layout.BindService);
+            SetContentView(Resource.Layout.bind_service);
 
             isConnected = false;
             binder = null;
 
             Button buttonStartBind = (Button)FindViewById(Resource.Id.buttonStartBind);
             Button buttonStopBind = (Button)FindViewById(Resource.Id.buttonStopBind);
-            Button buttonGetCounter = (Button)FindViewById(Resource.Id.buttonGetCounter);
+            Button buttonGetCounter = (Button)FindViewById(Resource.Id.buttonGetCount);
 
             buttonStartBind.Click += OnButtonStartBindClicked;
             buttonStopBind.Click += OnButtonStopBindClicked;
@@ -58,22 +80,11 @@ namespace ServiceSample
             }
         }
 
-        private void OnButtonStartBindClicked(object sender, System.EventArgs e)
+        private void OnButtonGetCounterClicked(object sender, EventArgs e)
         {
-            BindService(new Intent(this, typeof(CounterService)), this, Bind.AutoCreate);
-            Toast.MakeText(this, "Bind Service", ToastLength.Short).Show();
-        }
-
-        private void OnButtonStopBindClicked(object sender, System.EventArgs e)
-        {
-            UnbindConnection();
-        }
-
-        private void OnButtonGetCounterClicked(object sender, System.EventArgs e)
-        {
-            if(counter != null)
+            if (counter != null)
             {
-                Toast.MakeText(this, "Count: " + counter.Count(), ToastLength.Short).Show();
+                Toast.MakeText(this, "Count: " + counter.GetCount(), ToastLength.Short).Show();
             }
             else
             {
@@ -81,31 +92,15 @@ namespace ServiceSample
             }
         }
 
-        public void OnServiceConnected(ComponentName name, IBinder service)
+        private void OnButtonStopBindClicked(object sender, EventArgs e)
         {
-            binder = (CountBinder)service;
-
-            isConnected = binder != null;
-
-            if(isConnected)
-            {
-                counter = binder.Service;
-                Toast.MakeText(this, "Service Connected", ToastLength.Short).Show();
-            }
-            else
-            {
-                counter = null;
-                Toast.MakeText(this, "Service Not Connected", ToastLength.Short).Show();
-            }
+            UnbindConnection();
         }
 
-        public void OnServiceDisconnected(ComponentName name)
+        private void OnButtonStartBindClicked(object sender, EventArgs e)
         {
-            counter = null;
-            binder = null;
-            isConnected = false;
-
-            Toast.MakeText(this, "Service Disconnected", ToastLength.Short).Show();
+            BindService(new Intent(this, typeof(CountService)), this, Bind.AutoCreate);
+            Toast.MakeText(this, "Bind Service", ToastLength.Short).Show();
         }
     }
 }

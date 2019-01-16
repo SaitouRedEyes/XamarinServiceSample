@@ -1,23 +1,24 @@
 ﻿using Android.App;
-using Android.Widget;
 using Android.OS;
+using Android.Support.V7.App;
+using Android.Widget;
 using Android.Content;
 using Android.Util;
 
 namespace ServiceSample
 {
-    [Activity(Label = "ServiceSample", MainLauncher = true)]
-    public class MainActivity : Activity
+    [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true)]
+    public class MainActivity : AppCompatActivity
     {
         Intent i;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+            // Set our view from the "main" layout resource
+            SetContentView(Resource.Layout.activity_main);
 
-            SetContentView(Resource.Layout.Main);
-
-            i = new Intent(this, typeof(CounterService));
+            i = new Intent(this, typeof(CountService));
 
             Button buttonStartService = (Button)FindViewById(Resource.Id.buttonStartService);
             Button buttonStopService = (Button)FindViewById(Resource.Id.buttonStopService);
@@ -30,7 +31,7 @@ namespace ServiceSample
 
         private void OnButtonStartServiceClicked(object sender, System.EventArgs e)
         {
-            if(!isMyServiceRunning(typeof(CounterService)))
+            if(!CountService.active)
             {
                 StartService(i);
                 Toast.MakeText(this, "Start Service", ToastLength.Short).Show();
@@ -43,7 +44,7 @@ namespace ServiceSample
 
         private void OnButtonStopServiceClicked(object sender, System.EventArgs e)
         {
-            if (isMyServiceRunning(typeof(CounterService)))
+            if (CountService.active)
             {
                 StopService(i);
                 Toast.MakeText(this, "Stop Service", ToastLength.Short).Show();
@@ -58,17 +59,5 @@ namespace ServiceSample
         {
             StartActivity(new Intent(this, typeof(BindServiceActivity)));
         }
-
-        private bool isMyServiceRunning(System.Type serviceClass)
-        {
-            ActivityManager manager = (ActivityManager)GetSystemService(ActivityService);
-
-            foreach (ActivityManager.RunningServiceInfo service in manager.GetRunningServices(int.MaxValue))
-            {   
-                if (service.Service.ClassName.Equals("com." + serviceClass.FullName)) return true;
-            }
-            return false;
-        }
     }
 }
-

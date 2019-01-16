@@ -1,0 +1,2 @@
+C:\Users\zeca_\OneDrive\Área de Trabalho\XamarinProjects\XamarinServiceSample\ServiceSample\obj\Debug\MonoAndroid81\res.flag
+C:\Users\zeca_\OneDrive\Área de Trabalho\XamarinProjects\XamarinServiceSample\ServiceSample\obj\Debug\MonoAndroid81\ServiceSample.csproj.CoreCompileInputs.cache
