@@ -6,7 +6,7 @@ using Java.Lang;
 
 namespace ServiceSample
 {
-    [Service(Name = "com.ServiceSample.CountService")]
+    [Service(IsolatedProcess = false, Name = "com.ServiceSample.CountService")]
     class CountService : Service, IRunnable, Count
     {
         protected int count;
